@@ -1,0 +1,35 @@
+import requests
+
+config = {}
+config["debug"] = True
+
+newUserName = input("username to check: ")
+if not newUserName:
+    print("empty username")
+session = requests.Session()
+
+tokenResult = session.post("https://auth.roblox.com/v1/usernames/validate", json={})
+token = tokenResult.headers.get("x-csrf-token")
+
+if config["debug"]:
+    print("[*] Returned T0KEN:", token)
+
+headers = {"x-csrf-token": token, "Content-Type": "application/json"}
+payload = {
+    "username": newUserName,
+    "context": "Signup",
+    "birthday": "1982-05-05T00:00:00.000Z",
+}
+
+response = session.post(
+    "https://auth.roblox.com/v1/usernames/validate", json=payload, headers=headers
+)
+
+data = response.json()
+statusCode = response.status_code
+if config["debug"]:
+    print("[*] Status Code:", statusCode)
+
+msg = data["message"]
+if statusCode == 200 and msg == "Username is valid":
+    print(f"[+] Valid Username: {newUserName}")
