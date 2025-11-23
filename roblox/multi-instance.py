@@ -11,6 +11,14 @@ CreateMutex.restype = wintypes.HANDLE
 GetLastError = kernel32.GetLastError
 GetLastError.restype = wintypes.DWORD
 
+ReleaseMutex = kernel32.ReleaseMutex
+ReleaseMutex.argtypes = (wintypes.HANDLE,)
+ReleaseMutex.restype = wintypes.BOOL
+
+CloseHandle = kernel32.CloseHandle
+CloseHandle.argtypes = (wintypes.HANDLE,)
+CloseHandle.restype = wintypes.BOOL
+
 mutex_name = "ROBLOX_singletonEvent"
 
 handle = CreateMutex(None, False, mutex_name)
@@ -22,4 +30,7 @@ else:
     print("done.")
 
 
-input("Press enter continue...")
+input("Press enter to stop multi instance...")
+
+ReleaseMutex(handle)
+CloseHandle(handle)
