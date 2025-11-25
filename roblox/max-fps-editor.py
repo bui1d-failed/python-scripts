@@ -133,9 +133,6 @@ def get_base_module(pid: int):
 
     return base_addr, module_name, exe_path
 
-pid = get_pid_by_name("RobloxPlayerBeta.exe")
-print("Game Process ID Found:", pid)
-
 ReadProcessMemory = kernel32.ReadProcessMemory
 ReadProcessMemory.argtypes = [
     wintypes.HANDLE,
@@ -202,15 +199,21 @@ class ProcessMemory:
             raise ctypes.WinError(ctypes.get_last_error())
         return written.value
 
-if pid:
-    # Target FPS
+pid = get_pid_by_name("RobloxPlayerBeta.exe")
+print("Game Process ID Found:", pid)
+while True:
     targetFPS = 9999.0
+    userSetFps = input("New FPS (or press enter to uncap fps): ")
+    if userSetFps.strip():
+        try:
+            targetFPS = float(userSetFps)
+        except ValueError:
+            print("[!] Invalid FPS")
+            exit()
 
-    userSetFps = input("New FPS: ")
-    try:
-        targetFPS = float(userSetFps)
-    except ValueError:
-        print("[!] Invalid FPS")
+    pid = get_pid_by_name("RobloxPlayerBeta.exe")
+    if not pid:
+        print("exiting, no game process found")
         exit()
 
     handle = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, False, pid)
