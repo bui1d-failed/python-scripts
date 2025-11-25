@@ -4,7 +4,6 @@ import requests
 
 config = {
     "automatic_update": True,
-    "debug_print": False,
 }
 
 # You can update this manually for faster performance, if you dont want automatic offsets updates
@@ -199,11 +198,10 @@ class ProcessMemory:
             raise ctypes.WinError(ctypes.get_last_error())
         return written.value
 
-pid = get_pid_by_name("RobloxPlayerBeta.exe")
-print("Game Process ID Found:", pid)
+print("[+] Press enter to uncap FPS")
 while True:
     targetFPS = 9999.0
-    userSetFps = input("New FPS (or press enter to uncap fps): ")
+    userSetFps = input("\n[?] Set New FPS: ")
     if userSetFps.strip():
         try:
             targetFPS = float(userSetFps)
@@ -213,20 +211,20 @@ while True:
 
     pid = get_pid_by_name("RobloxPlayerBeta.exe")
     if not pid:
-        print("exiting, no game process found")
+        print("Exiting, no game process found")
         exit()
+
+    print("\n[*] Process ID:", pid)
 
     handle = OpenProcess(PROCESS_VM_READ | PROCESS_VM_WRITE | PROCESS_VM_OPERATION, False, pid)
     pm = ProcessMemory(handle)
 
     base_addr, module_name, exe_path = get_base_module(pid)
     task_scheduler_ptr = pm.read_uintptr(base_addr + offsets["TaskSchedulerPointer"])
-    # debug print
-    #print("TaskScheduler pointer:", hex(task_scheduler_ptr))
 
     # write memory
     pm.write_double(task_scheduler_ptr + offsets["TaskSchedulerMaxFPS"], 1.0 / targetFPS)
-    print("Write success:", targetFPS)
+    print("[+] Write success:", targetFPS)
 
     newfps = pm.read_double(task_scheduler_ptr + offsets["TaskSchedulerMaxFPS"])
-    print("New FPS:", 1.0 / newfps)
+    print("[+] New FPS:", 1.0 / newfps)
