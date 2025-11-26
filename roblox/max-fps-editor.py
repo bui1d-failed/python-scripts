@@ -12,11 +12,11 @@ offsets = {
     "TaskSchedulerPointer": 0x78E3008
 }
 
-OFFSETS_URL = "https://offsets.ntgetwritewatch.workers.dev/offsets.json" # not my own offsets and website
+offsets_url = "https://offsets.ntgetwritewatch.workers.dev/offsets.json" # not my own offsets and website
 
 if config["automatic_update"]:
     def fetch_offsets():
-        resp = requests.get(OFFSETS_URL)
+        resp = requests.get(offsets_url)
         resp.raise_for_status()
         data = resp.json()
 
